@@ -4,6 +4,9 @@ This app approaches the issue differently: instead of setting a time when a task
 
 Implemented with React Native and TailwindCSS.
 
+Availalble at [https://stoplist-iota.vercel.app/](https://stoplist-iota.vercel.app/)
+
+
 TODO:
 - [x] update elapsed time on task
 - [x] styling in general
