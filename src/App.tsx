@@ -1,6 +1,5 @@
 
 import { useEffect, useState, useRef } from 'react'
-import Button from './components/Button'
 
 export type Task = {
     key: number
@@ -41,21 +40,21 @@ function App() {
     ])
     const [isRunning, setIsRunning] = useState(false)
     const [elapsedTime, setElapsedTime] = useState(0)
-    const intervalIdRef = useRef(null)
+    const intervalIdRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const startTimeRef = useRef(0)
     useEffect(() => {
 
         function handleAddTask(e: KeyboardEvent){
-            const text_input = document.getElementById("new-task-text")
-            if (e.key == "Enter" && text_input.value !== "") {
+            const text_input = document.getElementById("new-task-text") as HTMLInputElement | null
+            const duration_input = document.getElementById("new-task-duration") as HTMLInputElement | null
+            if (e.key === "Enter" && text_input && duration_input && text_input.value !== "") {
                 console.log("Enter pressed!")
-                const duration_input = document.getElementById("new-task-duration")
-                setTasks(t => [...t, {
-                                        key: tasks.length,                    
-                                        name: text_input.value,
-                                        duration: (duration_input.value || 1) * 60,
-                                        elapsed: 0,
-                                        done: false
+                setTasks(currentTasks => [...currentTasks, {
+                    key: currentTasks.length,
+                    name: text_input.value,
+                    duration: Number(duration_input.value || 1) * 60,
+                    elapsed: 0,
+                    done: false
                 }])
                 duration_input.value = ""
                 text_input.value = ""
@@ -75,7 +74,9 @@ function App() {
             }, 1000)
         }
         return () => {
-            clearInterval(intervalIdRef.current);
+            if (intervalIdRef.current !== null) {
+                clearInterval(intervalIdRef.current);
+            }
         }
     }, [isRunning])
 
@@ -101,12 +102,12 @@ function App() {
         setTasks(tempTasks)        
     }
 
-    function handleTaskNameChange(event, index){
+    function handleTaskNameChange(event: React.ChangeEvent<HTMLInputElement>, index: number){
         let newTasks = [...tasks]
         newTasks[index] = {
             key: index,
             name: event.target.name === "name" ? event.target.value : tasks[index].name,
-            duration: event.target.name === "duration" ? event.target.value : tasks[index].duration,
+            duration: event.target.name === "duration" ? Number(event.target.value) : tasks[index].duration,
             elapsed: tasks[index].elapsed,
             done: tasks[index].done,
         }
@@ -117,10 +118,10 @@ function App() {
         let hours = Math.floor(elapsedTime / (3600 * 1000))
         let minutes = Math.floor((elapsedTime / (60 * 1000)) % 60)
         let seconds = Math.floor((elapsedTime / 1000) % 60)
-        seconds = String(seconds).padStart(2, "0")
-        minutes = String(minutes).padStart(2, "0")
+        let seconds_str = String(seconds).padStart(2, "0")
+        let minutes_str = String(minutes).padStart(2, "0")
 
-        return `${hours}:${minutes}:${seconds}`; 
+        return `${hours}:${minutes_str}:${seconds_str}`; 
     }
 
     function toggleTimer(){
